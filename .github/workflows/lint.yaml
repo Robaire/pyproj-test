@@ -24,7 +24,6 @@ jobs:
       - name: Get modified files
         id: modified_files
         run: |
-          # Get the list of modified Python files
           files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E '\.py$')
           echo "Modified files: $files"
           echo "files=$files" >> $GITHUB_ENV
