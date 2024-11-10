@@ -21,14 +21,10 @@ jobs:
           pip install --upgrade pip
           pip install black isort
 
-      - name: Test
-        run: |
-          echo "test"
-
       - name: Get modified files
         id: modified_files
         run: |
-          files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E '\.py$')
+          files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep ".py$")
           echo "Modified files: $files"
           echo "files=$files" >> $GITHUB_ENV
 
