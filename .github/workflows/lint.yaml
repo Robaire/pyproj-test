@@ -21,6 +21,10 @@ jobs:
           pip install --upgrade pip
           pip install black isort
 
+      - name: Test
+        run: |
+          echo "test"
+
       - name: Get modified files
         id: modified_files
         run: |
