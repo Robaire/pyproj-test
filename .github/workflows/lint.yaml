@@ -20,17 +20,19 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install black isort
-
-      - name: Get modified files
-        uses: nrwl/last-successful-commit-action@v1
+      
+      - uses: nrwl/last-successful-commit-action@v1
+        id: last_commit
         with:
           branch: "main"
           workflow_id: "lint.yaml"
           github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get modified files
         id: modified_files
         run: |
-          git diff --name-only ${{ steps.modified_files.outputs.commit_hash }} ${{ github.event.after }}
-          files=$(git diff --name-only ${{ steps.modified_files.outputs.commit_hash }} ${{ github.event.after }} | grep ".py$" || echo "")
+          git diff --name-only ${{ steps.last_commit.outputs.commit_hash }} ${{ github.event.after }}
+          files=$(git diff --name-only ${{ steps.last_commit.outputs.commit_hash }} ${{ github.event.after }} | grep ".py$" || echo "")
           echo "files<<EOF" >> $GITHUB_ENV
           echo "$files" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
