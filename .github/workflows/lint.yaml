@@ -26,13 +26,13 @@ jobs:
         run: |
           git diff --name-only ${{ github.event.before }} ${{ github.event.after }}
           files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep ".py$" || echo "")
-          echo "files=$files" >> $GITHUB_OUTPUT
+          echo "files=$files" >> $GITHUB_ENV
 
       - name: Format files
         run: |
-          if [ -n "${{ steps.modified_files.outputs.files }}" ]; then
+          if [ -n "$files" ]; then
             echo "Formatting files:"
-            for file in ${{ steps.modified_files.outputs.files }}; do
+            for file in $files; do
               isort $file
               black $file
             done
@@ -43,10 +43,10 @@ jobs:
       - name: Commit and push changes
         if: steps.modified_files.outputs.files != ''
         run: |
-          if [ -n "${{ steps.modified_files.outputs.files }}" ]; then
+          if [ -n "$files" ]; then
             git config --global user.name "github-actions[bot]"
             git config --global user.email "github-actions[bot]@users.noreply.github.com"
-            for file in ${{ steps.modified_files.outputs.files }}; do
+            for file in $files; do
               git add $file
             done
             git commit -m "Format"
