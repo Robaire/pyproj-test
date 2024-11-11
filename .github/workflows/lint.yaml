@@ -39,7 +39,7 @@ jobs:
           fi
 
       - name: Commit and push changes
-        if: steps.modified_files.outputs.files != ""
+        if: steps.modified_files.outputs.files != ''
         run: |
           if [ -n "${{ steps.modified_files.outputs.files }}" ]; then
             git config --global user.name "github-actions[bot]"
