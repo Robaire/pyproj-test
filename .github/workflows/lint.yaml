@@ -14,7 +14,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: "3.13"
 
       - name: Install dependencies
         run: |
@@ -24,37 +24,27 @@ jobs:
       - name: Get modified files
         id: modified_files
         run: |
-          files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep ".py$")
-          echo "Modified files: $files"
-          echo "files=$files" >> $GITHUB_ENV
+          git diff --name-only ${{ github.event.before }} ${{ github.event.after }}
+          files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep ".py$")
+          echo "files=$files" >> $GITHUB_OUTPUT
 
-      - name: Run isort on modified files
+      - name: Format files
         run: |
-          if [ -n "$files" ]; then
-            isort $files
-          else
-            echo "No Python files to sort"
-          fi
-
-      - name: Run Black on modified files
-        run: |
-          if [ -n "$files" ]; then
-            black --check $files
+          if [ -n "${{ steps.modified_files.outputs.files }}" ]; then
+            echo "Formatting files:"
+            isort ${{ steps.modified_files.outputs.files }}
+            black ${{ steps.modified_files.outputs.files }}
           else
             echo "No Python files to format"
           fi
 
       - name: Commit and push changes
-        if: success() && github.event_name == 'push' && steps.modified_files.outputs.files != ''
+        if: steps.modified_files.outputs.files != ""
         run: |
-          if [ -n "$files" ]; then
-            isort $files
-            black $files
-            git config --global user.name 'github-actions[bot]'
-            git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-            git add $files
-            git commit -m "Format" || echo "No changes to commit"
+          if [ -n "${{ steps.modified_files.outputs.files }}" ]; then
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git add ${{ steps.modified_files.outputs.files }}
+            git commit -m "Format"
             git push
-          else
-            echo "No changes to commit"
           fi
