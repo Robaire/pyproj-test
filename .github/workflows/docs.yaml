@@ -43,8 +43,7 @@ jobs:
 
       - name: Build documentation
         run: |
-          uv tool install sphinx
-          uv tool install sphinx-autodoc-typehints || true
+          uv tool install sphinx --with sphinx-autodoc-typehints
           sphinx-apidoc -o docs/source/api pyproj
           sphinx-build docs/source docs/build/html
 
